@@ -1,4 +1,5 @@
-User-space multi-touch driver 
+Waveshare 7 inch LCD touchscreen driver
+User-space multi-touch driver
 ---
 For
 usb 6-1: new full-speed USB device number 3 using sunxi-ohci  
@@ -47,6 +48,10 @@ $ cat /usr/include/linux/uinput.h | grep UINPUT_VERSION
 If version is >= 5 this driver might not be suitable however you can modify it.
 
 This driver may be needed to those who use Linux distros with Legacy Kernels < 4. Since in new Kernels this tocuhscreen supports right from a box.
+
+There is a new touchscreen module in rev 3.1 of present dispaly   
+Because of it X_RATIO and Y_RATIO was added   
+Recommeneded values are 0.78 and 0.8 respectively
 
 Inforamtion sources:  
 https://github.com/bsteinsbo/rpi_touch_driver  

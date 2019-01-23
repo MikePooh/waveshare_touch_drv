@@ -1,4 +1,5 @@
-/* 
+/*
+Waveshare 7 inch LCD touchscreen driver
 User-space multi-touch driver for
 usb 6-1: new full-speed USB device number 3 using sunxi-ohci
 usb 6-1: New USB device found, idVendor=0eef, idProduct=0005
@@ -45,6 +46,10 @@ If version is >= 5 this driver might not be suitable however you can modify it.
 
 This driver may be needed to those who use Linux distros with Legacy Kernels < 4. Since in new Kernels this tocuhscreen supports right from a box.
 
+There is a new touchscreen module in rev 3.1 of present dispaly
+Because of it X_RATIO and Y_RATIO was added
+recommeneded values are 0.78 and 0.8 respectively
+
 Inforamtion sources:
 https://github.com/bsteinsbo/rpi_touch_driver
 https://habr.com/post/267655/
@@ -75,6 +80,9 @@ Copyright (c) 2018 Mike Ovchinnikov
 
 #define TARGET_VID 0x0eef
 #define TARGET_PID 0x0005
+
+#define X_RATIO 0.78
+#define Y_RATIO 0.8
 
 void emit(int fd, int type, int code, int val)
 {
@@ -291,7 +299,10 @@ int main(void)
          emit(uinput_fd, EV_SYN, SYN_REPORT, 0);
          continue; // ABS_MT_TRACKING_ID -1
       }         
-      
+        
+      float x;
+      float y;      
+        
       for (int i = 0; i < sizeof(data); i++)
          printf("%02x ", (unsigned int)data[i]);
       printf("\n");
@@ -299,10 +310,12 @@ int main(void)
       emit(uinput_fd, EV_ABS, ABS_MT_SLOT, data[2]);
       printf("ABS_MT_TRACKING_ID %d\n", data[2]);
       emit(uinput_fd, EV_ABS, ABS_MT_TRACKING_ID, data[2]);
-      printf("ABS_MT_POSITION_X: %d\n", data[4] + data[5]*256); //X POSITION
-      emit(uinput_fd, EV_ABS, ABS_MT_POSITION_X, data[4] + data[5]*256);
-      printf("ABS_MT_POSITION_Y: %d\n", data[6] + data[7]*256); //Y POSITION
-      emit(uinput_fd, EV_ABS, ABS_MT_POSITION_Y, data[6] + data[7]*256);
+      x = (data[4] + data[5]*256) * X_RATIO;
+      y = (data[6] + data[7]*256) * Y_RATIO;
+      printf("ABS_MT_POSITION_X: %d\n", (int)x); //X POSITION
+      emit(uinput_fd, EV_ABS, ABS_MT_POSITION_X, (int)x);
+      printf("ABS_MT_POSITION_Y: %d\n", (int)y); //Y POSITION
+      emit(uinput_fd, EV_ABS, ABS_MT_POSITION_Y, (int)y);
       printf("ABS_PRESSURE: %d\n", data[3]); //CONTACT SPOT
       emit(uinput_fd, EV_ABS, ABS_PRESSURE, data[3]);
       if (rowc < 1)         
